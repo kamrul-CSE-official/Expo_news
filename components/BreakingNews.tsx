@@ -1,5 +1,5 @@
-import { Text, StyleSheet, View, FlatList, Animated } from "react-native";
-import React, { useState } from "react";
+import { Animated, View, Text, StyleSheet } from "react-native";
+import React from "react";
 import { Colors } from "@/constants/Colors";
 import { NewsDataType } from "@/types";
 import SliderItem from "./SliderItem";
@@ -15,9 +15,10 @@ type INews = {
 export default function BreakingNews({ newsList }: INews) {
   const scrollX = useSharedValue(0);
 
+  // Define the scroll handler
   const onScrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
-      scrollX.value = event.contentOffset.x;
+      scrollX.value = event.contentOffset.x; // Track the horizontal scroll position
     },
   });
 
@@ -34,8 +35,8 @@ export default function BreakingNews({ newsList }: INews) {
           horizontal
           showsVerticalScrollIndicator={false}
           pagingEnabled
-          onScroll={onScrollHandler} // Ensure this is correctly set
-          scrollEventThrottle={16}
+          onScroll={onScrollHandler} // Attach scroll handler
+          scrollEventThrottle={16} // Ensure efficient scrolling
         />
       </View>
     </View>
