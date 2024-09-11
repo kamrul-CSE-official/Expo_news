@@ -1,5 +1,5 @@
-import { ActivityIndicator, StyleSheet, View } from "react-native";
 import React, { useEffect, useState } from "react";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Header from "@/components/Header";
 import Searchbar from "@/components/Searchbar";
@@ -7,28 +7,30 @@ import BreakingNews from "@/components/BreakingNews";
 import NewsDataSet from "@/newsData.json";
 import { NewsDataType } from "@/types";
 
-type Props = {};
-
-const Page = (props: Props) => {
+const Page = () => {
   const { top: safeTop } = useSafeAreaInsets();
   const [news, setNews] = useState<NewsDataType[]>([]);
   const [breakingNews, setBreakingNews] = useState<NewsDataType[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Simulating data fetching
-    setTimeout(() => {
-      setNews(NewsDataSet);
-    }, 800);
+    const fetchData = async () => {
+      setTimeout(() => {
+        setNews(NewsDataSet);
+        setIsLoading(false);
+      }, 800);
+    };
+    fetchData();
   }, []);
 
   useEffect(() => {
-    if (news.length > 0) {
-      setIsLoading(false);
-      // Shuffle the news data and pick 5 random items
-      const shuffled = [...news].sort(() => 0.5 - Math.random());
-      const fiveRandomNews = shuffled.slice(0, 5);
-      setBreakingNews(fiveRandomNews);
+    if (news.length) {
+      // Shuffle and pick random 5 news
+      const shuffledNews = [...news]
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 5);
+      setBreakingNews(shuffledNews);
     }
   }, [news]);
 
@@ -36,16 +38,16 @@ const Page = (props: Props) => {
     <View style={[styles.container, { paddingTop: safeTop }]}>
       <Header />
       <Searchbar />
-      {!isLoading && news.length > 0 ? (
-        <BreakingNews newsList={breakingNews} />
-      ) : (
+      {isLoading ? (
         <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <BreakingNews newsList={breakingNews} />
       )}
     </View>
   );
 };
 
-export default Page;
+export default React.memo(Page);
 
 const styles = StyleSheet.create({
   container: {

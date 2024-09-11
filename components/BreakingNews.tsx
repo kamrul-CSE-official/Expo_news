@@ -1,42 +1,61 @@
-import { Animated, View, Text, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
 import { Colors } from "@/constants/Colors";
 import { NewsDataType } from "@/types";
 import SliderItem from "./SliderItem";
-import {
-  useSharedValue,
-  useAnimatedScrollHandler,
-} from "react-native-reanimated";
+import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
+import { useSharedValue } from "react-native-reanimated";
+import Pagination from "./CarouselPagenation";
 
 type INews = {
   newsList: NewsDataType[];
 };
 
 export default function BreakingNews({ newsList }: INews) {
-  const scrollX = useSharedValue(0);
+  const width = Dimensions.get("window").width;
 
-  // Define the scroll handler
-  const onScrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollX.value = event.contentOffset.x; // Track the horizontal scroll position
-    },
-  });
+  // Carousel reference and progress tracking
+  const ref = React.useRef<ICarouselInstance>(null);
+  const progress = useSharedValue(0);
+
+  const onProgressChange = (index: number) => {
+    progress.value = index;
+  };
+
+  const onPressPagination = (index: number) => {
+    ref.current?.scrollTo({ index, animated: true });
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Breaking News</Text>
-      <View style={styles.sliderWrapper}>
-        <Animated.FlatList
+      <View style={{ flex: 1 }}>
+        <Carousel
+          ref={ref}
+          loop
+          width={width}
+          height={width / 2}
+          autoPlay={true}
           data={newsList}
-          keyExtractor={(_, index) => `list_item${index}`}
-          renderItem={({ item, index }) => (
-            <SliderItem sliderItem={item} index={index} scrollX={scrollX} />
-          )}
-          horizontal
-          showsVerticalScrollIndicator={false}
-          pagingEnabled
-          onScroll={onScrollHandler} // Attach scroll handler
-          scrollEventThrottle={16} // Ensure efficient scrolling
+          onSnapToItem={onProgressChange}
+          scrollAnimationDuration={1000}
+          renderItem={({ item }) => <SliderItem sliderItem={item} />}
+          panGestureHandlerProps={{
+            activeOffsetX: [-10, 10],
+          }}
+        />
+      </View>
+      <View style={{ position: "absolute", bottom: 0 }}>
+        <Pagination
+          data={newsList}
+          progress={progress}
+          onPress={onPressPagination}
         />
       </View>
     </View>
@@ -53,8 +72,5 @@ const styles = StyleSheet.create({
     color: Colors.black,
     marginBottom: 10,
     marginLeft: 20,
-  },
-  sliderWrapper: {
-    height: 180,
   },
 });

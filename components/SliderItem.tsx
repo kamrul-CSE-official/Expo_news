@@ -1,19 +1,16 @@
-import { View, Text, StyleSheet, Dimensions, Image } from "react-native";
 import React from "react";
-import { NewsDataType } from "@/types";
-import { SharedValue } from "react-native-reanimated";
+import { View, Text, StyleSheet, Dimensions, Image } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { NewsDataType } from "@/types";
 import { Colors } from "@/constants/Colors";
 
 type Props = {
   sliderItem: NewsDataType;
-  index: number;
-  scrollX: SharedValue<number>;
 };
 
 const { width } = Dimensions.get("screen");
 
-const SliderItem = ({ sliderItem, scrollX }: Props) => {
+const SliderItem = ({ sliderItem }: Props) => {
   return (
     <View style={styles.itemWrapper}>
       <Image source={{ uri: sliderItem.banner }} style={styles.image} />
@@ -36,7 +33,7 @@ const SliderItem = ({ sliderItem, scrollX }: Props) => {
   );
 };
 
-export default SliderItem;
+export default React.memo(SliderItem);
 
 const styles = StyleSheet.create({
   itemWrapper: {
